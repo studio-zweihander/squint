@@ -1,0 +1,39 @@
+[install]
+auto = false
+frozenLockfile = true
+production = true
+dryRun = false
+dev = false
+optional = false
+peer = false
+linker = "isolated"
+minimumReleaseAge = 259200
+minimumReleaseAgeExcludes = [
+    "@types/bun",
+    "@types/node",
+    "typescript"
+]
+
+[install.cache]
+disable = false
+
+[install.lockfile]
+save = true
+
+[install.scopes]
+# telemetry = false
+
+[test]
+timeout = 30000
+
+[console]
+depth = 3
+
+[run]
+shell = "bun"
+
+[build]
+target = "bun"
+minify = true
+sourcemap = "external"
+splitting = true
