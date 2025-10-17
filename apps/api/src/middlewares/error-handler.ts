@@ -1,4 +1,4 @@
-import { Elysia, error } from 'elysia';
+import { Elysia } from 'elysia';
 import { logger } from '../lib/logger';
 import { config } from '../config/env';
 import { HTTP_STATUS, ERROR_CODES } from '../config/constant';
@@ -22,13 +22,18 @@ export function createErrorHandler() {
     const errorId = generateErrorId();
     const timestamp = new Date().toISOString();
 
+    const errorCode = typeof code === 'string' ? code : ERROR_CODES.INTERNAL_ERROR;
+
+    const errorMessage = err instanceof Error ? err.message : 'Erro interno do servidor';
+    const errorStack = err instanceof Error ? err.stack : undefined;
+
     const response: ErrorResponse = {
       success: false,
       error: {
         id: errorId,
-        code: code === 'UNKNOWN' ? ERROR_CODES.INTERNAL_ERROR : code,
-        message: err.message || 'Erro interno do servidor',
-        ...(config.NODE_ENV === 'development' && { details: { stack: err.stack } }),
+        code: errorCode,
+        message: errorMessage,
+        ...(config.NODE_ENV === 'development' && errorStack ? { details: { stack: errorStack } } : {}),
       },
       meta: { timestamp },
     };
@@ -36,9 +41,9 @@ export function createErrorHandler() {
     logger.error(
       {
         errorId,
-        code,
-        message: err.message,
-        stack: err.stack,
+        code: errorCode,
+        message: errorMessage,
+        stack: errorStack,
         path: (err as any).path,
       },
       'Erro capturado pelo handler'
